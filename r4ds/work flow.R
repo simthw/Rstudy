@@ -4,10 +4,12 @@ setwd("D:/100study/130_data/136_data for science")
 
 
 # load library ------------------------------------------------------------
+# libraries used in this script
 library(ggplot2)
 library(dplyr)
-# add data ‘penguins’
+library(nycflights13)
 library(palmerpenguins)
+library(tidyverse)
 
 # global level, 'color' can pass to each geom layer
 ggplot(
@@ -114,34 +116,38 @@ ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
   geom_point(aes(color = species, shape = species))
 
 # chapter3, data transformation -------------------------------------------
-# install.packages("nycflights13")
-library(nycflights13)
+## filter(), select rows
 flights |> # pipe operator, different appearance in vs code
   filter(dep_delay > 120)
-jan1 <- flights |>
+# &, and operator
+jan1 <- flights |> # save the result to 'jan1'
   filter(month == 1 & day == 1)
-# combining | and ==
+# %in%, variable equals one of values on the right
 flights |>
-  filter(month %in% c(1, 2))
+  filter(month %in% c(1, 2)) # month is 1 or 2
 # character, must add quotation
 flights |>
   filter(dest %in% c("IAH", "HOU"))
-# descending in big-to-small order
+
+## arrange(), sort rows
+# in descending order, big-to-small
 flights |>
-  arrange(desc(dep_delay))
+  arrange(desc(dep_delay)) # most to least delayed
 # sory by year, month, day and dep_time
 flights |>
   arrange(year, month, day, dep_time)
-# remove duplicate rows
+
+# distinct(), select unique rows
 flights |>
-  distinct()
-# find all unique origin and des pairs
+  distinct() # remove duplicate rows
+# find all unique origin and destination pairs
 flights |>
-  distinct(origin, dest)
+  distinct(origin, dest) # don't keep other columns
 # keep other columns when filtering for unique rows
+# find the first occurrence of a unique row in the dataset
 flights |>
   distinct(origin, dest, .keep_all = T)
-# find pairs occurrence numbers and sort them
+# count numbers of occurrences and arrange numbers in descenging order
 flights |>
   count(origin, dest, sort = T)
 # mutate() for add new coulmn to dataset, .after change position of added
