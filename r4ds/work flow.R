@@ -146,18 +146,21 @@ flights |>
 # keep other columns when filtering for unique rows
 # find the first occurrence of a unique row in the dataset
 flights |>
-  distinct(origin, dest, .keep_all = T)
+  distinct(origin, dest, .keep_all = TRUE)
 # count numbers of occurrences and arrange numbers in descenging order
 flights |>
-  count(origin, dest, sort = T)
-# mutate() for add new coulmn to dataset, .after change position of added
+  count(origin, dest, sort = TRUE)
+
+## column operations
+# add new coulmn to dataset, default position on the right side
+# .before or .after change position
 flights |>
   mutate(
     gain = dep_delay - arr_delay,
-    speed = distance / air_time * 60,
-    .after = day
+    speed = distance / air_time * 60, # speed
+    .after = day # right of column 'day'
   )
-# .keep only keep columns used in calculation
+# .keep only keep 5 columns used in this calculation
 flights |>
   mutate(
     gain = dep_delay - arr_delay,
@@ -165,18 +168,25 @@ flights |>
     gain_per_hour = gain / hours,
     .keep = "used"
   )
-# select columns
+
+# select columns, zoom in subsets of columns
 flights |>
   select(year, month, day)
+flights |>
+  select(year:day)
+flights |>
+  select(where(is.character))
+
+# rename columns
+flights |>
+  rename(tail_num = tailnum)
+
 # move column variable position
 flights |>
-  relocate(starts_with("arr"), .before = dep_time)
-# any_of can specify the columns that have been assigned to a character vector
-variables <- c("year", "month", "day", "dep_delay", "arr_delay")
+  relocate(time_hour, air_time)
 flights |>
-  select(
-    any_of(variables)
-  )
+  relocate(starts_with("arr"), .before = dep_time)
+
 # easier than conventional method
 flights |>
   filter(dest == "IAH") |>
