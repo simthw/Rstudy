@@ -52,3 +52,37 @@ flights |>
   select(
     any_of(variables)
   )
+# 筛选时忽略大小写用ignore.case = TRUE # nolint
+flights |>
+  select(contains("TIME", ignore.case = TRUE)) |>
+  head(5)
+# 改名然后放在第一列
+flights |>
+  rename(air_time_min = air_time) |>
+  relocate(air_time_min) |>
+  head(5)
+# arrange时要包含此列
+flights |>
+  select(tailnum, arr_delay) |>
+  arrange(arr_delay) |>
+  head(5)
+
+## page 58
+# delay最高的航司
+flights |>
+  group_by(carrier) |>
+  slice_max(dep_delay, n = 1) |>
+  arrange(dep_delay)
+# delay最高和机场有关联吗？
+flights |>
+  group_by(carrier, dest) |>
+  summarise(
+    n = n()
+  )
+flights |>
+  group_by(dest) |>
+  summarise(
+    delay = mean(dep_delay, na.rm = TRUE),
+    n = n()
+  ) |>
+  arrange(desc(delay))

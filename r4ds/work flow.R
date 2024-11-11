@@ -187,33 +187,51 @@ flights |>
 flights |>
   relocate(starts_with("arr"), .before = dep_time)
 
-# easier than conventional method
+# flights data,then filter,then mutate, then select, then arrange
 flights |>
-  filter(dest == "IAH") |>
-  mutate(speed = distance / air_time * 60) |>
-  select(year:day, dep_time, carrier, flight, speed) |>
-  arrange(desc(speed))
-# groups, mean
+  filter(dest == "IAH") |> # filter rows with dest "IAH"
+  mutate(speed = distance / air_time * 60) |> # calculate speed
+  select(year:day, dep_time, carrier, flight, speed) |> # select columns
+  arrange(desc(speed)) |> # fast->slow # nolint
+  head(10)
+
+# groups, counts
 flights |>
-  group_by(month) |>
+  group_by(month) |> # subsequent operations work by month
   summarize(
-    avg_delay = mean(dep_delay, na.rm = T),
-    n = n()
-  ) |>
-  slice_head(n = 3) # take 3 rows
-# groups based on more variable
+    avg_delay = mean(dep_delay, na.rm = TRUE),
+    n = n() # counts, each group numbers
+  )
+flights |>
+  group_by(dest) |>
+  slice_max(arr_delay, n = 1) |> # slice_max, n=1必须加
+  # slice_max(arr_delay,n=1,with_ties=FALSE)|> #不保留相同值的行
+  relocate(dest)
+
+## groups based on more variable
 daily <- flights |>
   group_by(year, month, day)
+
 # grouped conflict with summarize
 daily_flights <- daily |>
+  # 对已分组数据汇总，.groups = "drop_last"表示不保留分组信息
   summarize(n = n(), .groups = "drop_last")
-# ungroup(), treat all rows as one group
+
+# ungroup(), 去除以前的分组
 daily |>
-  ungroup() |>
+  ungroup() |> # ungrouped dataframe
   summarize(
-    avg_delay = mean(dep_delay, na.rm = T),
+    avg_delay = mean(dep_delay, na.rm = TRUE),
     flights = n()
   )
+flights |>
+  summarise(
+    delay = mean(dep_delay, na.rm = TRUE),
+    n = n(),
+    .by = month # 按月分组
+  ) |>
+  arrange(month) # month按升序排列
+
 # combination of plot and pipe
 batters <- Lahman::Batting |>
   group_by(playerID) |>
