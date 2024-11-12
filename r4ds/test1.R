@@ -15,7 +15,7 @@ flights |> filter(distance == min(distance, na.rm = TRUE))
 flights |>
   janitor::clean_names()
 
-# page 51
+# page 51 --------------------------------------------------------------
 # 将时间转换为分钟数的函数
 convert_to_minutes <- function(time) {
   hour <- time %/% 100
@@ -67,7 +67,7 @@ flights |>
   arrange(arr_delay) |>
   head(5)
 
-## page 58
+# page 58 --------------------------------------------------------------
 # delay最高的航司
 flights |>
   group_by(carrier) |>
@@ -86,3 +86,48 @@ flights |>
     n = n()
   ) |>
   arrange(desc(delay))
+
+# 一天中delay是如何变化的
+ggplot(flights, aes(x = dep_time, y = dep_delay)) +
+  geom_point(alpha = 0.1)
+
+# slice_函数，n为负数时，列出所有行
+flights |>
+  slice_min(dep_delay, n = -2)
+
+# count函数的作用
+flights |>
+  count(year, month, day, sort = TRUE)
+
+#
+df <- tibble(
+  x = 1:5,
+  y = c("a", "b", "a", "a", "b"),
+  z = c("K", "K", "L", "L", "K")
+)
+df |>
+  group_by(y)
+df |>
+  arrange(y) # 调整了y列的顺序
+
+# summarise的特点
+df |>
+  # 按y组分组，y/z的话就是按y和z分组
+  group_by(y) |>
+  summarize(
+    mean_x = mean(x),
+  )
+df |>
+  group_by(y, z) |>
+  summarise(mean_x = mean(x), .groups = "drop")
+
+# 输出的结果按照分组合并
+df |>
+  group_by(y, z) |>
+  summarise(mean_ = mean(x))
+# 新添加一列计算结果
+df |>
+  group_by(y, z) |>
+  mutate(mean_x = mean(x))
+
+# page 72 --------------------------------------------------------------

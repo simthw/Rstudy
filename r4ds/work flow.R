@@ -232,22 +232,79 @@ flights |>
   ) |>
   arrange(month) # month按升序排列
 
-# 1111
-# combination of plot and pipe
-batters <- Lahman::Batting |>
+## combination of plot and pipe
+# 数据集写入到本地file
+library(Lahman)
+write.csv(Batting, "r4ds/data/Batting.csv", row.names = FALSE)
+# 数据集中，如果n样本太小，performance不准确
+batters <- Batting |>
   group_by(playerID) |>
   summarise(
-    performance = sum(H, na.rm = T) / sum(AB, na.rm = T),
-    n = sum(AB, na.rm = T)
-  )
+    # batting average, performance
+    performance = sum(H, na.rm = TRUE) / sum(AB, na.rm = TRUE),
+    n = sum(AB, na.rm = TRUE)
+  ) |>
+  arrange(desc(n))
+
+# |> for data tidy, + for plot
 batters |>
   filter(n > 100) |>
   ggplot(aes(n, performance)) +
   geom_point(alpha = 0.1) +
-  geom_smooth(se = F)
+  geom_smooth(se = FALSE)
+
+# chapter4 code style ----------------------------------------------------
+library(styler)
+# |> and + operator in writing codes
+# |> and + position
+flights |>
+  group_by(month) |>
+  summarise(
+    delay = mean(arr_delay, na.rm = TRUE)
+  ) |> # )position
+  ggplot(aes(x = month, y = delay)) +
+  geom_point() +
+  geom_line()
+
+flights |>
+  group_by(dest) |>
+  summarise(
+    distance = mean(distance),
+    speed = mean(distance / air_time, na.rm = TRUE)
+  ) |>
+  ggplot(aes(x = distance, y = speed)) +
+  geom_smooth(
+    method = "loess",
+    span = 0.5,
+    se = FALSE,
+    color = "white",
+    linewidth = 4
+  ) +
+  geom_point()
+
+# chapter5, data tidying--------------------------------------------------
+table1
+table2
+table3
+
+# compute rate per 10000
+table1 |>
+  mutate(rate = cases / population * 10000)
+# compute cases per year
+table1 |>
+  group_by(year) |>
+  summarise(total_cases = sum(cases))
+# cases 随时间变化图
+ggplot(table1, aes(x = year, y = cases)) +
+  geom_line(aes(group = country), color = "grey50") +
+  geom_point(aes(color = country, shape = country)) +
+  scale_x_continuous(breaks = c(1999, 2000))
 
 
-# dataset billboard -------------------------------------------------------
+
+
+
+
 # pivot_longer() function
 billboard_longer <- billboard |>
   pivot_longer(
