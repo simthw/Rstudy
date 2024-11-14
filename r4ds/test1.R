@@ -131,3 +131,8 @@ df |>
   mutate(mean_x = mean(x))
 
 # page 72 --------------------------------------------------------------
+cases2 <- table2 |>
+  filter(type == "cases")
+population2 <- table2 |>
+  filter(type == "population")
+rate=(cases2[4] / population2[4]) * 10000

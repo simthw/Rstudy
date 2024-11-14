@@ -300,66 +300,54 @@ ggplot(table1, aes(x = year, y = cases)) +
   geom_point(aes(color = country, shape = country)) +
   scale_x_continuous(breaks = c(1999, 2000))
 
-
-
-
-
-
 # pivot_longer() function
 billboard_longer <- billboard |>
   pivot_longer(
     cols = starts_with("wk"),
     names_to = "week",
     values_to = "rank",
-    values_drop_na = T
+    values_drop_na = TRUE # drop NA values
   ) |>
   mutate(
-    week = parse_number(week) # extract first number from a string
+    # 'wk1'->'1' # nolint
+    week = parse_number(week)
   )
+# 排名随时间变化
 billboard_longer |>
+  # group=track, 确保每个音乐有自己的一条线
   ggplot(aes(week, rank, group = track)) +
   geom_line(alpha = 0.25) +
   scale_y_reverse()
-# construct a small tibble, how pivot_longer() works
+
+## pivoting的理解
+# 手动创建一个tibble, how pivot_longer() works
 df <- tribble(
   ~id, ~bp1, ~bp2,
   "a", 100, 120,
   "b", 140, 115,
   "c", 120, 125
 )
+
+# 转换为长格式
 df |> pivot_longer(
-  cols = bp1:bp2,
-  names_to = "measurement",
-  values_to = "value"
+  cols = bp1:bp2, # 需要被转换的列
+  names_to = "measurement", # 新列名
+  values_to = "value" # 新列的值
 )
-# coulumns contain "_"
-who2 <- read.csv("who2.csv", sep = ",", row.names = 1)
+
+# 结核病诊断数据集who2，sp/rel/ep, 诊断方法；
+#  m/f，性别； 0-14/15-24/25-34/35-44/45-54/55-64/65, 年龄
 who2 |>
-  as_tibble(who2) |>
   pivot_longer(
     cols = !(country:year),
+    # 从'sp_rel_ep_m_f_15-24'中提取
     names_to = c("diagnosis", "gender", "age"),
     names_sep = "_",
     values_to = "count"
   )
 
 # columns contain names of two variables
-family <- c("1", "2", "3", "4", "5")
-dob_child1 <- c(
-  "1998-11-26", "1996-06-22", "2002-07-11",
-  "2004-10-10", "2000-12-05"
-)
-dob_child2 <- c(
-  "2000-01-29", "na", "2004-04-05",
-  "2009-08-27", "2005-02-28"
-)
-name_child1 <- c("Susan", "Mark", "Sam", "Craig", "Parker")
-name_child2 <- c("Jose", "na", "Seth", "Khai", "Gracie")
-household <- data.frame(
-  family, dob_child1,
-  dob_child2, name_child1, name_child2
-) |>
-  as_tibble(household)
+# 'household',dob:date of birth
 household |>
   pivot_longer(
     cols = !family,
