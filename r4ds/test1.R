@@ -135,4 +135,6 @@ cases2 <- table2 |>
   filter(type == "cases")
 population2 <- table2 |>
   filter(type == "population")
-rate=(cases2[4] / population2[4]) * 10000
+rate <- (cases2[4] / population2[4]) * 10000
+
+# page 103 --------------------------------------------------------------

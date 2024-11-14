@@ -300,7 +300,7 @@ ggplot(table1, aes(x = year, y = cases)) +
   geom_point(aes(color = country, shape = country)) +
   scale_x_continuous(breaks = c(1999, 2000))
 
-# pivot_longer() function
+## 长表数据，pivot_longer() function
 billboard_longer <- billboard |>
   pivot_longer(
     cols = starts_with("wk"),
@@ -328,9 +328,9 @@ df <- tribble(
   "c", 120, 125
 )
 
-# 转换为长格式
+# 转换为长表格式
 df |> pivot_longer(
-  cols = bp1:bp2, # 需要被转换的列
+  cols = bp1:bp2, # 列名转换为新列的值
   names_to = "measurement", # 新列名
   values_to = "value" # 新列的值
 )
@@ -351,36 +351,58 @@ who2 |>
 household |>
   pivot_longer(
     cols = !family,
-    names_to = c(".value", "child"),
+    names_to = c(".value", "child"), # '.valus'作用
     names_sep = "_",
-    values_drop_na = T
+    values_drop_na = TRUE
   )
-# pivot_wider()
-cms_patient_experience <- read.csv("cms_patient_experience.csv",
-  sep = ",", row.names = 1
-)
-cms_patient_experience <- as_tibble(cms_patient_experience)
+
+## 宽表数据, pivot_wider() function
 cms_patient_experience |>
   distinct(measure_cd, measure_title)
+
 cms_patient_experience |>
   pivot_wider(
-    id_cols = starts_with("org"),
+    id_cols = starts_with("org"), # nolint
     names_from = measure_cd,
     values_from = prf_rate
   )
+
 # how pivot_wider() works
 id <- c("a", "b", "b", "a", "a")
-measurement <- c("bp1", "bp1", "bp2", "bp2", "bp3")
-value <- c(100, 140, 115, 120, 105)
-df1 <- data.frame(id, measurement, value)
-df1 <- as_tibble(df1)
+# 确定长表转宽表的列名来源
 df1 |>
-  distinct(measurement) |>
-  pull()
-#  [1] "bp1" "bp2" "bp3"
+  distinct(measurement)
+# 新的列名，填充新列的值
 df1 |>
   pivot_wider(
     names_from = measurement,
     values_from = value
   )
-# vignette("pivot", package = "tidyr")
+df1 |>
+  select(-measurement, -value) |>
+  distinct() |>
+  mutate(x = NA, y = NA, z = NA)
+
+# 长表转宽表，对应值数量大于1的情况
+df2 <- tribble(
+  ~id, ~measurement, ~value,
+  "a", "bp1", "100",
+  "a", "bp1", "102",
+  "a", "bp2", "120",
+  "b", "bp1", "140",
+  "b", "bp2", "115",
+)
+## ’a‘有两个bp1
+df2 |>
+  pivot_wider(
+    names_from = measurement,
+    values_from = value
+  )
+# 找到’df2‘有多个值的行
+df2 |>
+  group_by(id, measurement) |>
+  summarise(n = n(), .groups = "drop_last") |>
+  filter(n > 1)
+
+# 'pivot'帮助文档
+vignette("pivot", package = "tidyr")
