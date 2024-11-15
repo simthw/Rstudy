@@ -138,3 +138,30 @@ population2 <- table2 |>
 rate <- (cases2[4] / population2[4]) * 10000
 
 # page 103 --------------------------------------------------------------
+read_csv("x,y\n1,'a,b'",
+  quote = "'" # set quote to a single quote
+)
+# 变量名缺失
+read_csv("a,b\n1,2,3\n4,5,6")
+# A tibble: 2 x 2
+#      a     b
+#  <dbl> <dbl>
+# 1     1    23
+# 2     4    56
+
+# 变量缺失value，填充’NA‘，缺失变量名，合并值
+read_csv("a,b,c\n1,2\n1,2,3,4")
+
+# '1,2'和'a,b'数据类型不同
+read_csv("a,b\n1,2\na,b")
+
+annoying <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+annoying[1]
+ggplot(annoying, aes(y = `2`, x = `1`)) +
+  geom_point()
+annoying |>
+  mutate(`3` = `2` / `1`) |>
+  rename(one = `1`, two = `2`, three = `3`)

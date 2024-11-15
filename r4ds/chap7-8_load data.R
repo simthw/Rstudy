@@ -30,6 +30,32 @@ read_csv(
   col_names = c("x", "y", "z")
 )
 
+# 数据类型识别
+read_csv("logical,numeric,date,string\n
+TRUE,1,2021-01-15,abc\n
+false,4.5,2021-02-15,def\n
+T,Inf,2021-02-16,ghi")
+
+# 出现’.'非默认语法，对识别数据类型有影响，可不加‘\n'
+# 输出结果为char类型
+read_csv("x\n
+10\n
+.\n
+20\n
+30")
+# 查看问题原因
+problems(df)
+# 指定‘.’为NA
+df <- read_csv("x\n
+10\n
+.\n
+20\n
+30", na = ".")
+
+
+
+
+
 # load data form multiple csv files
 sales_files <- c(
   "data/01-sales.csv", "data/02-sales.csv",
