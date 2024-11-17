@@ -165,3 +165,43 @@ ggplot(annoying, aes(y = `2`, x = `1`)) +
 annoying |>
   mutate(`3` = `2` / `1`) |>
   rename(one = `1`, two = `2`, three = `3`)
+
+# page210 --------------------------------------------------------------
+# 含有NA的数据
+flights |>
+  mutate(
+    dep_time_na = is.na(dep_time),
+    sched_dep_time_na = is.na(sched_dep_time),
+    dep_delay_na = is.na(dep_delay),
+  ) |>
+  count(dep_time_na, sched_dep_time_na, dep_delay_na)
+
+# page213 --------------------------------------------------------------
+# arr_delay missing but dep_delay not missing
+flights |>
+  filter(is.na(arr_delay & !is.na(dep_delay)))
+# neither arr_time nor sched_arr_time missing, but arr_delay is
+flights |>
+  filter(!is.na(arr_time) & !is.na(sched_arr_time) & is.na(arr_delay))
+
+# 计算dep_time列的NA数量
+flights |>
+  filter(is.na(dep_time)) |>
+  count()
+# 统计dep_time列为NA时，其他列也为NA的数量
+flights |>
+  filter(is.na(dep_time)) |>
+  summarise(across(everything(), ~ sum(is.na(.))))
+
+# dep_time为NA认定为航班取消，每天取消航班数
+flights |>
+  group_by(year, month, day) |>
+  filter(is.na(dep_time)) |>
+  summarise(n = n())
+
+# page 219 --------------------------------------------------------------
+x <- 0:20
+if_else(x %% 2 == 0, "even", "odd")
+x1 <- c("Monday", "Saturday", "Wednesday")
+x2 <- c(-1, 2, -4, 6, -7, 2)
+if_else(x2 < 0, -x2, x2)
