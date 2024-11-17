@@ -46,38 +46,62 @@ read_csv("x\n
 # 查看问题原因
 problems(df)
 # 指定‘.’为NA
-df <- read_csv("x\n
+csv1 <- read_csv("x\n
 10\n
 .\n
 20\n
 30", na = ".")
 
+csv2 <- ("x,y,z\n1,2,3")
+# 指定列的数据类型为character,不指定的话就是numeric
+read_csv(csv2,
+  col_types = cols(.default = col_character())
+)
+# 只读取x列
+read_csv(csv2,
+  col_types = cols_only(x = col_character())
+)
 
+# 列出'r4ds/data'文件夹下所有csv文件
+csv_files <- list.files("r4ds/data",
+  pattern = "\\.csv$",
+  full.names = TRUE
+)
 
-
-
-# load data form multiple csv files
+# 从'r4ds/data'文件夹读取多个csv文件
 sales_files <- c(
-  "data/01-sales.csv", "data/02-sales.csv",
-  "data/03-sales.csv"
+  "r4ds/data/01-sales.csv", "r4ds/data/02-sales.csv",
+  "r4ds/data/03-sales.csv"
 )
-read_csv(sales_files, id = "file")
-# 2nd method
-sales_files <- list.files("data",
-  pattern = "sales\\.csv$",
-  full.names = T
-)
+# 添加'id='file'列,用于区分不同数据来源
 read_csv(sales_files, id = "file")
 
-# write data, 1st
-write_csv(students, "data/students-2.csv")
-# factor information is lost, reading from a plain-text file, unreliable
-read_csv("students-2.csv")
-# load exact r object, 2nd
-write_rds(students, "data/students.rds")
-read_rds("students.rds")
+# 将line9-23中读入并处理过的的‘students'存储
+write_csv(students, "r4ds/data/students-2.csv")
+# factor information is lost, reading from a plain-text file
+read_csv("r4ds/data/students-2.csv")
 
-y <- 1:4
-mean(y)
+# 'meal_plan',处理好的factor的信息丢失，使用rds文件存储可保存处理过的信息
+write_rds(students, "r4ds/data/students.rds")
+read_rds("r4ds/data/students.rds")
 
-reprex::reprex()
+# 第二种方式，使用arrow包,以parquet文件存储
+# install.packages("arrow", type = "mac.binary") mac安装
+library(arrow)
+write_parquet(students, "r4ds/data/students.parquet")
+read_parquet("r4ds/data/students.parquet")
+
+## 手动创建dataframe
+# 1. 使用tibble()函数，按照列创建
+tibble(
+  x = c(1, 2, 5),
+  y = c("h", "m", "g"),
+  z = c(0.08, 0.83, 0.60)
+)
+# 2. 使用tribble()函数，按照行创建
+tribble(
+  ~x, ~y, ~z,
+  1, "h", "0.08",
+  2, "m", "0.83",
+  5, "g", "0.60"
+)
