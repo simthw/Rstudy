@@ -29,7 +29,7 @@ age_b <- NA
 age_a == age_b
 # 'dep_time==NA'会让每行都生成NA
 flights |>
-  filter(dep_time == NA)
+  filter(is.na(dep_time))
 
 # 使用is.na()函数
 is.na(c(TRUE, NA, FALSE))
@@ -72,10 +72,9 @@ flights |>
   filter(month %in% c(11, 12))
 
 ## 比较对NA处理的不同，NA %in% NA is TRUE
-c(1, 2, NA) == NA
+is.na(1, 2, NA)
 # [1] NA NA NA
-c(1, 2, NA) %in% NA
-# [1] FALSE FALSE  TRUE
+
 flights |>
   filter(dep_time %in% c(NA, 0800))
 
@@ -154,3 +153,9 @@ flights |>
     ),
     .keep = "used"
   )
+
+# chapter13 --------------------------------------------
+# 将字符串中包含的数字解析出来
+x <- c("$1234", "usd3513", "59%")
+parse_number(x)
+
